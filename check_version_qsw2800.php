@@ -1,32 +1,30 @@
 <?php
-$software = '6.3.100.38'; //The tested version SoftWare
+$software = '6.3.100.39'; //The tested version SoftWare
 $bootrom = '5.1.3'; //The tested version BootRom
 require_once "config.php";
-require_once "PHPTelnet.php";
-$s = fopen($fname = "swichs.txt", "rt");
+require_once "library/PHPTelnet.php";
+require_once "library/Logger.php";
+$s = fopen($fname = "logs/.swichs.txt", "rt");
 $swich = explode(";", fread($s, filesize($fname)));
 $colvo = count($swich);
 echo "Set of testable switches: ", $colvo . "<br>";
-require_once('library/Logger.php');
+
 
 $login = $config["device"]["login"];
 $password = $config["device"]["password"];
 
 $telnet = new PHPTelnet();
-$logger = new Logger('commutators_log');
+$logger = new Logger('commutators_log', 'Check Version qsw 2800');
+$softup = new Selector('.vers_updating');
+$bootup = new Selector('.boot_updating');
 
-$logger->info('This is first log comment');
-echo $logger->file();
-
-$logger->info('This is second log comment 2');
-/*
 for ($z = 0; $z < $colvo; $z++) {
     echo('<br>');
     echo "$swich[$z]  - ";
-//$ip = $_GET['swiID'];
-//$ranIP = array("qsw2800");
 
     $result = $telnet->Connect($swich[$z], $login, $password);
+    $log = $telnet->ConnectError($result);
+
 
     if ($result == 0) {
         $telnet->DoCommand('', $result);
@@ -34,35 +32,44 @@ for ($z = 0; $z < $colvo; $z++) {
 
 
             $telnet->DoCommand('sh ver', $result);
-            // NOTE: $result may contain newlines
+
             parse_str($result);
 
             $soft = strstr((string)$result, "SoftWare Version ");
             if (stripos($result, $software) == false) {
-                $nup = fopen("need updating.txt", "a");
-                fwrite($nup, "$swich[$z];");
-                fclose($nup);
+                $softup->note("$swich[$z];");
             }
             $boot = strstr((string)$result, "BootRom Version ");
             if (stripos($result, $bootrom) == false) {
-                $nup = fopen("boot updating.txt", "a");
-                fwrite($nup, "$swich[$z];");
-                fclose($nup);
+                $bootup->note("$swich[$z];");
             }
-            echo substr($soft, 0, 28);
-            echo substr($boot, 0, 25);
+            $reformvers = substr($soft, 0, 28);
+            $reformboot = substr($boot, 0, 25);
+            echo $reformvers, $reformboot;
             echo('<br>');
             // echo $result;
-               $telnet->DoCommand('reload', $result);
+             /*  $telnet->DoCommand('reload', $result);
                if (stripos($result, 'Process with reboot? [Y/N]') !== false) {
                $telnet->DoCommand('y', $result); }
                print_r($result);
+            */
+            $log = ("$swich[$z] - $reformvers $reformboot");
+            $logger->info($log);
+
         } else {
-            echo $result;
+            $qsw = $result;
+            echo $qsw;
+            $qsw = mb_substr($qsw, 1, -1);
+            $logger->info("$swich[$z] - $qsw");
         }
+
         $telnet->Disconnect();
+    } else {
+    echo $log;
+    $logger->info("$swich[$z] - $log");
     }
 }
-*/
 
-//echo ($ip);
+
+
+
