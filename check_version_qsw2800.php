@@ -1,10 +1,11 @@
 <?php
-$software = '6.3.100.39'; //The tested version SoftWare
-$bootrom = '5.1.3'; //The tested version BootRom
+
 require_once "config.php";
 require_once "library/PHPTelnet.php";
 require_once "library/Logger.php";
-$s = fopen($fname = "logs/.swichs.txt", "rt");
+$software = $config["device"]["software"];
+$bootrom = $config["device"]["bootrom"];
+$s = fopen($fname = "logs/swichs.txt", "rt");
 $swich = explode(";", fread($s, filesize($fname)));
 $colvo = count($swich);
 echo "Set of testable switches: ", $colvo . "<br>";
@@ -15,8 +16,8 @@ $password = $config["device"]["password"];
 
 $telnet = new PHPTelnet();
 $logger = new Logger('commutators_log', 'Check Version qsw 2800');
-$softup = new Selector('.vers_updating');
-$bootup = new Selector('.boot_updating');
+$softup = new Selector('vers_updating');
+$bootup = new Selector('boot_updating');
 
 for ($z = 0; $z < $colvo; $z++) {
     echo('<br>');
@@ -68,6 +69,7 @@ for ($z = 0; $z < $colvo; $z++) {
     echo $log;
     $logger->info("$swich[$z] - $log");
     }
+
 }
 
 

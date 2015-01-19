@@ -2,7 +2,8 @@
 require_once "config.php";
 require_once "library/PHPTelnet.php";
 require_once "library/Logger.php";
-$s = fopen($fname = "logs/.vers_updating", "rt");
+$bootrom = $config["device"]["bootrom"];
+$s = fopen($fname = "logs/swichs.txt", "rt");
 $swich = explode(";", fread($s, filesize($fname)));
 $colvo = count($swich);
 
@@ -11,8 +12,8 @@ $password = $config["device"]["password"];
 
 $telnet = new PHPTelnet();
 $logger = new Logger('commutators_log', 'Software Updater');
-$softup = new Selector('.vers_updating');
-$bootup = new Selector('.boot_updating');
+$softup = new Selector('vers_updating');
+$bootup = new Selector('boot_updating');
 
 for ($z = 0; $z < $colvo; $z++) {
     echo('<br>');
@@ -24,39 +25,41 @@ for ($z = 0; $z < $colvo; $z++) {
 
     if ($result == 0) {
 
-     //   $telnet->DoCommand($config["device"]["ftp-boot.rom"], $result);
-        if (stripos($result, 'Process with reboot? [Y/N]') !== false) {
-            $telnet->DoCommand('y', $result); }
+
+        $telnet->DoCommand($config["device"]["ftp-boot.rom"], $result);
+        echo($result);
+        if (stripos($result, 'Confirm to overwrite the existed destination file?  [Y/N]') !== false) {
+            $telnet->DoCommand('y', $result);
             echo $result;
-
-        /* parse_str($result);
-
-        $soft = strstr((string)$result, "SoftWare Version ");
-        if (stripos($result, $software) == false) {
-            $softup->note("$swich[$z];");
+            var_dump($result);
+        $logger->info($swich[$z], $result);}
+       /* while (true) {
+            stripos($result, 'write');
+        } */
+       // if (stripos($result, 'Write ok.') !== false) {
+           /* $telnet->DoCommand($config["device"]["ftp-nos.img"], $result);
+            if (stripos($result, 'Confirm to overwrite the existed destination file?  [Y/N]') !== false) {
+                $telnet->DoCommand('y', $result); }
+            echo $result;
+            $logger->info($swich[$z], $result);
+           if (stripos($result, 'Write ok.') == false) {
+           break; }
+            */
+       // } else {
+         //   break;
         }
-        $boot = strstr((string)$result, "BootRom Version ");
-        if (stripos($result, $bootrom) == false) {
-            $bootup->note("$swich[$z];");
-        }
-        $reformvers = substr($soft, 0, 28);
-        $reformboot = substr($boot, 0, 25);
-        echo $reformvers, $reformboot;
-        echo('<br>');
-        // echo $result;
-          $telnet->DoCommand('reload', $result);
-          if (stripos($result, 'Process with reboot? [Y/N]') !== false) {
-          $telnet->DoCommand('y', $result); }
-          print_r($result);
 
-        $log = ("$swich[$z] - $reformvers $reformboot");
-        $logger->info($log); */
+         parse_str($result);
 
-    }
+
+          echo($result);
+
+           //}
 
     $telnet->Disconnect();
 
     echo $log;
     $logger->info("$swich[$z] - $log");
+
 
 }
