@@ -8,7 +8,7 @@ $bootrom = $config["device"]["bootrom"];
 $s = fopen($fname = "logs/swichs.txt", "rt");
 $swich = explode(";", fread($s, filesize($fname)));
 $colvo = count($swich);
-echo "Set of testable switches: ", $colvo . "<br>";
+//echo "Set of testable switches: ", $colvo . "<br>";
 
 
 $login = $config["device"]["login"];
@@ -20,8 +20,8 @@ $softup = new Selector('vers_updating');
 $bootup = new Selector('boot_updating');
 
 for ($z = 0; $z < $colvo; $z++) {
-    echo('<br>');
-    echo "$swich[$z]  - ";
+   // echo('<br>');
+  //  echo "$swich[$z]  - ";
 
     $result = $telnet->Connect($swich[$z], $login, $password);
     $log = $telnet->ConnectError($result);
@@ -46,9 +46,9 @@ for ($z = 0; $z < $colvo; $z++) {
             }
             $reformvers = substr($soft, 0, 28);
             $reformboot = substr($boot, 0, 25);
-            echo $reformvers, $reformboot;
-            echo('<br>');
-            // echo $result;
+        //    echo $reformvers, $reformboot;
+        //    echo('<br>');
+         //    echo $result;
              /*  $telnet->DoCommand('reload', $result);
                if (stripos($result, 'Process with reboot? [Y/N]') !== false) {
                $telnet->DoCommand('y', $result); }
@@ -59,14 +59,14 @@ for ($z = 0; $z < $colvo; $z++) {
 
         } else {
             $qsw = $result;
-            echo $qsw;
+         //   echo $qsw;
             $qsw = mb_substr($qsw, 1, -1);
             $logger->info("$swich[$z] - $qsw");
         }
 
         $telnet->Disconnect();
     } else {
-    echo $log;
+   // echo $log;
     $logger->info("$swich[$z] - $log");
     }
 

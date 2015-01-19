@@ -19,13 +19,13 @@ class Logger
     {
         $filepath = $this->log_dir . '/' . $filename . '_' . '.txt';
         $this->file = fopen($filepath, 'a');
-        fwrite($this->file, date("Y-m-d H:i") . " " . $marker . "\r\n" . "\r\n");
+        fwrite($this->file, date("Y-m-d H:i") . " " . $marker . "\n" . "\n");
     }
 
     function info($message)
     {
         if ($message){
-            fwrite($this->file, $message . "\r\n");
+            fwrite($this->file, $message . "\n");
         }
     }
 }
