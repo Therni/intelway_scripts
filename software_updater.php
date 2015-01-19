@@ -1,65 +1,59 @@
 <?php
+# Подключаем необходимые библиотеки
 require_once "config.php";
-require_once "library/PHPTelnet.php";
+require_once "library/Telnet.php";
 require_once "library/Logger.php";
-$bootrom = $config["device"]["bootrom"];
-$s = fopen($fname = "logs/swichs.txt", "rt");
-$swich = explode(";", fread($s, filesize($fname)));
-$colvo = count($swich);
 
+$bootrom = $config["device"]["bootrom"]; # Версия bootrom
+
+# Получаем данные по коммутаторам для обновления
+$switch_file = fopen($fname = "logs/swichs.txt", "rt");
+$switch_list = explode(";", fread($s, filesize($fname)));
+
+# Получаем данные доступа из конфигурации
 $login = $config["device"]["login"];
 $password = $config["device"]["password"];
 
-$telnet = new PHPTelnet();
+# Создаем дополнительные объекты
 $logger = new Logger('commutators_log', 'Software Updater');
 $softup = new Selector('vers_updating');
 $bootup = new Selector('boot_updating');
 
-for ($z = 0; $z < $colvo; $z++) {
-    echo('<br>');
-    echo "$swich[$z]  - ";
+# Перебираем список всех коммутаторов
+foreach ($switch_list as $switch_ip) {
 
-    $result = $telnet->Connect($swich[$z], $login, $password);
-    $log = $telnet->ConnectError($result);
+    echo '<br>';
+    echo $switch_ip . ' - ';
 
+    # Записываем переменные по умолчанию
+    $switch_status = 'Write bootrom completed';
 
-    if ($result == 0) {
+    try {
+        # Создаем новый объект с сокетом подключения по Telnet
+        $telnet = new Telnet($switch_ip);
 
+        # Авторизуемся на устройстве
+        $telnet->login($login, $password);
 
-        $telnet->DoCommand($config["device"]["ftp-boot.rom"], $result);
-        echo($result);
+        # Выполняем команду обновления BootRom
+        $result = $telnet->exec($config["device"]["ftp-boot.rom"]);
+
         if (stripos($result, 'Confirm to overwrite the existed destination file?  [Y/N]') !== false) {
-            $telnet->DoCommand('y', $result);
-            echo $result;
-            var_dump($result);
-        $logger->info($swich[$z], $result);}
-       /* while (true) {
-            stripos($result, 'write');
-        } */
-       // if (stripos($result, 'Write ok.') !== false) {
-           /* $telnet->DoCommand($config["device"]["ftp-nos.img"], $result);
-            if (stripos($result, 'Confirm to overwrite the existed destination file?  [Y/N]') !== false) {
-                $telnet->DoCommand('y', $result); }
-            echo $result;
-            $logger->info($swich[$z], $result);
-           if (stripos($result, 'Write ok.') == false) {
-           break; }
-            */
-       // } else {
-         //   break;
+            # Если коммутатор спрашивает подтверждение, подтверждаем
+            $result = $telnet->exec('y');
         }
+        # Уничтожаем объект (деструктор сделает disconnect)
+        $telnet = null;
 
-         parse_str($result);
+    } catch (Exception $error) {
+        # Если на любом этапе возникнет ошибка, запишем ее в статус
+        $switch_status = $error;
+    }
 
+    # Выведем результат выполнения для свича
+    echo $status;
 
-          echo($result);
-
-           //}
-
-    $telnet->Disconnect();
-
-    echo $log;
-    $logger->info("$swich[$z] - $log");
-
+    # Записываем в лог результат обработки
+    $logger->info($swith_ip, $switch_status);
 
 }
