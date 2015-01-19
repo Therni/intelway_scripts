@@ -158,8 +158,8 @@ class Telnet {
 	 */
 	public function login($username, $password) {
 		try {
-			$this->setPrompt('login:');
-			$this->waitPrompt();
+			//$this->setPrompt('login:');
+			//$this->waitPrompt();
 			$this->write($username);
 			$this->setPrompt('Password:');
 			$this->waitPrompt();
