@@ -108,10 +108,11 @@ class Telnet {
 		if (!$this->socket) {
 			throw new Exception("Cannot connect to $this->host on port $this->port");
 		}
-		
+
+        /*
 		if (!empty($this->prompt)) {
 			$this->waitPrompt();
-		}
+		}*/
 
 		return self::TELNET_OK;
 	}
