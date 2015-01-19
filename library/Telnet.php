@@ -109,10 +109,9 @@ class Telnet {
 			throw new Exception("Cannot connect to $this->host on port $this->port");
 		}
 
-        /*
 		if (!empty($this->prompt)) {
 			$this->waitPrompt();
-		}*/
+		}
 
 		return self::TELNET_OK;
 	}
@@ -158,8 +157,8 @@ class Telnet {
 	 */
 	public function login($username, $password) {
 		try {
-			//$this->setPrompt('login:');
-			//$this->waitPrompt();
+			$this->setPrompt('login:');
+			$this->waitPrompt();
 			$this->write($username);
 			$this->setPrompt('Password:');
 			$this->waitPrompt();

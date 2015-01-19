@@ -30,10 +30,13 @@ foreach ($switch_list as $switch_ip) {
 
     try {
         # Создаем новый объект с сокетом подключения по Telnet
-        $telnet = new Telnet($switch_ip, 23, 10, '#', 10);
+        $telnet = new Telnet($switch_ip, 23, 10, 'login:', 10);
 
         # Авторизуемся на устройстве
-        $telnet->login($login, $password);
+        $result = $telnet->setPrompt('password:');
+        $result = $telnet->exec($login);
+        $result = $telnet->setPrompt('#');
+        $result = $telnet->exec($password);
 
         # Выполняем команду обновления BootRom
         $result = $telnet->exec($config["device"]["ftp-boot.rom"]);
