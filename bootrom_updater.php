@@ -2,7 +2,7 @@
 require_once "config.php";
 require_once "library/PHPTelnet.php";
 require_once "library/Logger.php";
-$s = fopen($fname = "logs/.boot_updating", "rt");
+$s = fopen($fname = "logs/boot_updating", "rt");
 $swich = explode(";", fread($s, filesize($fname)));
 $colvo = count($swich);
 
@@ -11,8 +11,8 @@ $password = $config["device"]["password"];
 
 $telnet = new PHPTelnet();
 $logger = new Logger('commutators_log', 'Bootrom Updater');
-$softup = new Selector('.vers_updating');
-$bootup = new Selector('.boot_updating');
+$softup = new Selector('vers_updating');
+$bootup = new Selector('boot_updating');
 
 for ($z = 0; $z < $colvo; $z++) {
     echo('<br>');
