@@ -8,7 +8,7 @@ $bootrom = $config["device"]["bootrom"]; # Версия bootrom
 
 # Получаем данные по коммутаторам для обновления
 $switch_file = fopen($fname = "logs/swichs.txt", "rt");
-$switch_list = explode(";", fread($s, filesize($switch_file)));
+$switch_list = explode(";", fread($switch_file, filesize($fname)));
 
 # Получаем данные доступа из конфигурации
 $login = $config["device"]["login"];
