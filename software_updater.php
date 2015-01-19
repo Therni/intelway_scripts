@@ -30,7 +30,7 @@ foreach ($switch_list as $switch_ip) {
 
     try {
         # Создаем новый объект с сокетом подключения по Telnet
-        $telnet = new Telnet($switch_ip);
+        $telnet = new Telnet($switch_ip, 23, 10, '#', 10);
 
         # Авторизуемся на устройстве
         $telnet->login($login, $password);
